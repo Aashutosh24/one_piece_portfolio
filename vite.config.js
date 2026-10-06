@@ -9,7 +9,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(import.meta.dirname, "index.html"),
-        grandline: resolve(import.meta.dirname, "grandline/index.html"),
+        
       },
     },
   },
