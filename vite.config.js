@@ -1,16 +1,13 @@
 import { defineConfig } from "vite";
 import { resolve } from "node:path";
 
-// Two separate pages in one project:
-//   /            → the motorcycle portfolio (index.html)
-//   /grandline/  → the Grand Line portfolio (grandline/index.html)
 export default defineConfig({
+  root: resolve(import.meta.dirname, "src/grandline"),
+
+  publicDir: resolve(import.meta.dirname, "public"),
+
   build: {
-    rollupOptions: {
-      input: {
-        main: resolve(import.meta.dirname, "index.html"),
-        
-      },
-    },
+    outDir: resolve(import.meta.dirname, "dist"),
+    emptyOutDir: true,
   },
 });
