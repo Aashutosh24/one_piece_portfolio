@@ -1,4 +1,5 @@
 node_modules/*# Logs
+# Logs
 logs
 *.log
 npm-debug.log*
@@ -146,4 +147,8 @@ vite.config.ts.timestamp-*
 .astro/
 
 # Turbo Repo
+<<<<<<< HEAD
 .turbo
+=======
+.turbo
+>>>>>>> 687b54b (UI_Enchanced)
