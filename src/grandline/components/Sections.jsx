@@ -227,28 +227,34 @@ const NAKAMA_LINKS = [
 export function Contact() {
   return (
     <section id="contact" className="nakama" data-theme="ink" data-chapter="Become my nakama">
-      <h2 className="sr-only">Become my nakama</h2>
-      <div className="nakama-art">
-        <img src={art.nakama} alt="A captain holds out his hand: become my nakama" loading="lazy" decoding="async" />
-        <nav className="nakama-hotspots" aria-label="Jump to">
-          {NAKAMA_LINKS.map((l) => (
-            <a key={l.href} href={l.href} style={{ top: `${l.top}%` }}>{l.label}</a>
-          ))}
-        </nav>
-      </div>
-
-      <div id="connect" className="nakama-card">
-        <nav className="nakama-quick" aria-label="Jump to">
-          {NAKAMA_LINKS.slice(0, 3).map((l) => <a key={l.href} href={l.href}>{l.label}</a>)}
-        </nav>
-        <p className="nakama-line">Open to internships and good collaborations, especially full-stack and AI/ML work.</p>
-        <a className="nakama-email" href={`mailto:${profile.email}`}>{profile.email}</a>
-        <div className="nakama-links">
-          {profile.links.map((l) => (
-            <a key={l.label} className="btn btn--ink" href={l.href} target="_blank" rel="noreferrer">{l.label}</a>
-          ))}
+      <h2 className="sr-only">Become my nakama: let's connect</h2>
+      {/* one framed piece: the invitation, and the hand holding out your card */}
+      <div className="nakama-frame">
+        <div className="nakama-art">
+          <img src={art.nakama} width="1400" height="1120" alt="A captain holds out his hand: become my nakama" loading="lazy" decoding="async" />
+          <nav className="nakama-hotspots" aria-label="Jump to">
+            {NAKAMA_LINKS.map((l) => (
+              <a key={l.href} href={l.href} style={{ top: `${l.top}%` }}>{l.label}</a>
+            ))}
+          </nav>
         </div>
-        <p className="nakama-where">Based in {profile.location}</p>
+
+        <div id="connect" className="nakama-card">
+          <p className="nakama-kicker">Let's connect</p>
+          <a className="nakama-email" href={`mailto:${profile.email}`}>{profile.email}</a>
+          <p className="nakama-line">Open to internships and good collaborations, especially full-stack and AI/ML work.</p>
+          <div className="nakama-links">
+            {profile.links.map((l) => (
+              <a key={l.label} className="btn btn--ink" href={l.href} target="_blank" rel="noreferrer">{l.label}</a>
+            ))}
+          </div>
+          <div className="nakama-foot">
+            <span className="nakama-where">Based in {profile.location}</span>
+            <nav className="nakama-quick" aria-label="Jump to">
+              {NAKAMA_LINKS.slice(0, 3).map((l) => <a key={l.href} href={l.href}>{l.label}</a>)}
+            </nav>
+          </div>
+        </div>
       </div>
     </section>
   );

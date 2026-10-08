@@ -4,11 +4,13 @@
    Anton for titles, Geist for reading, katakana sound effects at the big moments.
    ========================================================================== */
 
-@font-face { font-family: "Anton"; src: url("/grandline/fonts/anton-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
-@font-face { font-family: "Geist"; src: url("/fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+/* Fonts are imported relative to this file, so Vite bundles them into the build:
+   they ship with the site no matter how the public/ folder is copied. */
+@font-face { font-family: "Anton"; src: url("./fonts/anton-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Geist"; src: url("./fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
 
 :root {
-  --display: "Anton", Impact, "Arial Narrow", sans-serif;
+  --display: "Anton", Impact, "Arial Narrow", "Roboto Condensed", "sans-serif-condensed", sans-serif;
   --text: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --sfx: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
 
@@ -268,25 +270,42 @@ section.stage { scroll-margin-top: 0; }
   font-size: 13px; font-weight: 800; letter-spacing: 0.02em; transform: rotate(-4deg); border-radius: 3px; }
 
 /* ---------------------------------------------------------------------------
-   Contact: become my nakama
+   Contact: become my nakama + let's connect, one framed piece.
+   Phones: the card is attached under the artwork inside the same frame.
+   Wide screens: the card sits in the captain's outstretched hand.
    --------------------------------------------------------------------------- */
-.nakama { background: var(--ink); padding: 56px var(--pad) calc(70px + env(safe-area-inset-bottom, 0px)); }
-.nakama-art { position: relative; max-width: min(980px, calc((100svh - 150px) * 1.25)); margin: 0 auto; border: 3px solid var(--paper); border-radius: 4px; overflow: hidden;
-  box-shadow: 8px 8px 0 var(--gold); }
+.nakama { background: var(--ink); padding: 48px 14px calc(70px + env(safe-area-inset-bottom, 0px)); }
+.nakama-frame { position: relative; max-width: min(1040px, calc((100svh - 140px) * 1.25)); margin: 0 auto; border: 3px solid var(--paper); border-radius: 6px;
+  overflow: hidden; box-shadow: 8px 8px 0 var(--gold); background: var(--gold); }
+.nakama-art { position: relative; }
 .nakama-art img { display: block; width: 100%; height: auto; }
 /* invisible hit areas over the menu printed in the speech bubble */
-.nakama-hotspots a { position: absolute; left: 75%; width: 22.5%; height: 4.6%; border-radius: 6px; rotate: -4deg; translate: 0 0.3%; color: transparent; font-size: 0;
-  text-decoration: none; transition: background 0.15s, box-shadow 0.15s; }
+.nakama-hotspots a { position: absolute; left: 75%; width: 22.5%; height: 4.6%; border-radius: 6px; rotate: -4deg; translate: 0 0.3%;
+  color: transparent; font-size: 0; text-decoration: none; transition: background 0.15s, box-shadow 0.15s; }
 .nakama-hotspots a:hover, .nakama-hotspots a:focus-visible { background: rgba(240, 168, 24, 0.28); box-shadow: inset 0 0 0 2px var(--ink); outline: none; }
-.nakama-card { max-width: 980px; margin: 30px auto 0; padding: 24px 22px 26px; background: var(--gold); color: var(--ink);
-  border: 2px solid var(--paper); border-radius: 4px; scroll-margin-top: calc(var(--bar-h) + 12px); }
-.nakama-quick { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
-.nakama-quick a { font-size: 14px; font-weight: 700; text-decoration: none; padding: 6px 12px; border: 2px solid var(--ink); border-radius: 999px; background: var(--paper); }
-.nakama-line { margin: 0 0 16px; max-width: 46ch; font-size: 16.5px; }
-.nakama-email { display: inline-block; font-size: clamp(15px, 4.5vw, 28px); font-weight: 800; text-decoration: none; border-bottom: 3px solid var(--ink);
-  overflow-wrap: anywhere; }
-.nakama-links { display: flex; gap: 10px; margin-top: 18px; }
-.nakama-where { margin: 18px 0 0; font-size: 14px; font-weight: 700; }
+.nakama-card { position: relative; padding: 20px 18px 22px; background: var(--gold); color: var(--ink); border-top: 3px solid var(--ink);
+  scroll-margin-top: calc(var(--bar-h) + 12px); }
+.nakama-kicker { margin: 0 0 6px; font-family: var(--display); font-size: 30px; line-height: 1; text-transform: uppercase; }
+.nakama-email { display: inline-block; font-size: clamp(15px, 4.6vw, 24px); font-weight: 800; text-decoration: none;
+  border-bottom: 3px solid var(--ink); overflow-wrap: anywhere; }
+.nakama-line { margin: 12px 0 0; max-width: 44ch; font-size: 15.5px; line-height: 1.55; }
+.nakama-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.nakama-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-top: 18px;
+  padding-top: 14px; border-top: 2px solid rgba(18, 18, 18, 0.18); }
+.nakama-where { font-size: 14px; font-weight: 700; }
+.nakama-quick { display: flex; flex-wrap: wrap; gap: 6px; }
+.nakama-quick a { font-size: 13px; font-weight: 700; text-decoration: none; padding: 5px 11px; border: 2px solid var(--ink);
+  border-radius: 999px; background: var(--paper); }
+
+@media (min-width: 900px) {
+  .nakama { padding: 72px var(--pad) 90px; }
+  .nakama-frame { background: none; }
+  /* the card rests in his open hand, bottom left */
+  .nakama-card { position: absolute; left: 4%; bottom: 5%; width: min(42%, 420px); padding: 22px 24px 22px;
+    border: 3px solid var(--ink); border-radius: 6px; box-shadow: 6px 6px 0 var(--ink); rotate: -2deg; }
+  .nakama-quick { display: none; } /* the bubble menu is big enough to click here */
+  .nakama-email { font-size: 20px; }
+}
 
 /* ---------------------------------------------------------------------------
    The crew peeking in from the edges
@@ -327,9 +346,31 @@ section.stage { scroll-margin-top: 0; }
 .zoro-options button:active { transform: translate(1px, 1px); }
 .zoro-leave { display: block; margin: 10px auto 0; border: 0; background: none; font-size: 13px; font-weight: 600; color: var(--muted);
   text-decoration: underline; cursor: pointer; }
-.zoro-toast { position: absolute; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); translate: -50% 0; margin: 0;
-  width: max-content; max-width: calc(100vw - 32px); padding: 9px 14px; border: 2px solid var(--ink); border-radius: 10px;
-  background: var(--ink); color: var(--paper); font-size: 14px; font-weight: 600; animation: bubble-in 0.25s ease both; }
+.zoro-toast { position: absolute; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); translate: -50% 0; margin: 0;
+  width: min(440px, calc(100vw - 24px)); display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 6px 12px;
+  padding: 12px 14px; border: 2px solid var(--ink); border-radius: 14px; background: var(--paper); color: var(--ink);
+  box-shadow: 5px 5px 0 var(--ink); pointer-events: auto; animation: bubble-in 0.25s ease both; }
+.zoro-toast-emoji { grid-row: span 2; font-size: 34px; line-height: 1; animation: giggle 0.5s ease-in-out 3; }
+.zoro-toast p { margin: 0; font-size: 15px; line-height: 1.4; }
+.zoro-toast button { justify-self: start; min-height: 40px; padding: 0 14px; border: 2px solid var(--ink); border-radius: 8px;
+  background: var(--gold); font-weight: 800; font-size: 14px; cursor: pointer; }
+@keyframes giggle { 0%, 100% { rotate: 0deg; } 25% { rotate: -12deg; } 75% { rotate: 12deg; } }
+/* 😂 + dust where he took off */
+.zoro-laugh { position: absolute; bottom: calc(var(--zh, 120px) + 10px + env(safe-area-inset-bottom, 0px)); translate: -50% 0;
+  display: grid; justify-items: center; pointer-events: none; }
+.zoro-laugh b { font-size: 44px; line-height: 1; animation: laugh-up 1.5s ease-out both; }
+.zoro-laugh i { font-style: normal; font-size: 30px; margin-top: calc(var(--zh, 120px) - 20px); animation: dust 0.9s ease-out both; }
+@keyframes laugh-up { 0% { opacity: 0; transform: translateY(10px) scale(0.6); } 20% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-40px) rotate(10deg); } }
+@keyframes dust { from { opacity: 0.9; transform: scale(0.6); } to { opacity: 0; transform: scale(1.6) translateX(-20px); } }
+
+/* phones: the question becomes a bottom sheet with big, easy buttons */
+@media (max-width: 640px) {
+  .zoro-bubble { left: 12px !important; right: 12px; width: auto; bottom: calc(150px + env(safe-area-inset-bottom, 0px)); padding: 16px; }
+  .zoro-say { font-size: 22px; }
+  .zoro-options button { min-height: 48px; font-size: 16px; }
+  .zoro-leave { font-size: 14px; padding: 8px; }
+  .zoro-hint { font-size: 14px; }
+}
 
 /* custom cursor (mouse only): Luffy */
 @media (pointer: fine) {
@@ -403,7 +444,6 @@ section.stage { scroll-margin-top: 0; }
   .hero-name { font-size: clamp(60px, 9.6vw, 160px); }
   .hero-peek { grid-column: 2; grid-row: 1; align-self: end; justify-self: center; width: min(36vw, 560px); margin: 0 0 -2px; z-index: 1; }
   .peek { width: 112px; top: 18svh; }
-  .nakama-card { padding: 30px 34px 32px; }
   .panel { padding: 28px 30px 30px; }
   .panel--wide .projects { grid-template-columns: 1fr 1fr; }
   .skills div { grid-template-columns: 120px 1fr; align-items: baseline; }

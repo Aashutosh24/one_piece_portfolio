@@ -28,15 +28,13 @@ export default function App() {
   const [theme, setTheme] = useState("paper");
   const [replay, setReplay] = useState({ 2: 0, 3: 0 });
 
-  // sound needs one tap or key press first (browser rule)
+  // Sound needs a real tap/click/key first (browser rule). On phones a touch that
+  // only scrolls doesn't count, so listen on every tap and keep re-waking audio.
   useEffect(() => {
     const on = () => unlockAudio();
-    window.addEventListener("pointerdown", on, { once: true });
-    window.addEventListener("keydown", on, { once: true });
-    return () => {
-      window.removeEventListener("pointerdown", on);
-      window.removeEventListener("keydown", on);
-    };
+    const evs = ["pointerup", "touchend", "click", "keydown"];
+    evs.forEach((e) => window.addEventListener(e, on, { passive: true }));
+    return () => evs.forEach((e) => window.removeEventListener(e, on));
   }, []);
 
   // the section crossing the middle of the screen names the chapter and tints the bar

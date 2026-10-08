@@ -3,7 +3,8 @@ import { art } from "../content.js";
 
 // Every so often Zoro runs in from a screen edge, stops, and stands there lost.
 // Tap him and he asks for directions; pick a place and he gives a thumbs up,
-// then runs off the wrong way while the page takes *you* there.
+// then runs off the wrong way, laughing. You stay right where you were reading
+// (the toast offers a link if you actually want to go there).
 // Ignore him and he turns around, scratches his head, and wanders off.
 
 const FIRST_AT = 18000;          // ms after load
@@ -23,7 +24,8 @@ const rand = (a, b) => a + Math.random() * (b - a);
 export default function ZoroLost({ paused, reduced, onGuide }) {
   // phase: off | in | lost | ask | thanks | off-run | wander
   const [z, setZ] = useState({ phase: "off", x: 0, dur: 0, face: 1 });
-  const [toast, setToast] = useState("");
+  const [toast, setToast] = useState(null); // { place }
+  const [laugh, setLaugh] = useState(null);  // x position of the 😂 burst
   const visits = useRef(0);
   const timers = useRef([]);
   const pausedRef = useRef(paused);
@@ -88,17 +90,24 @@ export default function ZoroLost({ paused, reduced, onGuide }) {
       // the wrong way: whichever edge is *farther* from him
       setZ((s) => {
         const toRight = s.x < (vw - w) / 2;
+        setLaugh(s.x + w / 2);
         return { ...s, phase: "off-run", x: toRight ? vw + 40 : -w - 40, dur: reduced ? 0 : 1100, face: toRight ? 1 : -1 };
       });
-      onGuide(place.id);
-      setToast(`He ran the other way. You go on to ${place.label}.`);
-      later(() => setToast(""), 3400);
+      setToast({ place });
+      later(() => setLaugh(null), 1600);
+      later(() => setToast(null), 6000);
       later(() => setZ({ phase: "off", x: 0, dur: 0, face: 1 }), 1200);
       later(() => schedule(rand(...EVERY)), 1300);
     }, 1100);
   };
 
-  if (z.phase === "off" && !toast) return null;
+  const goThere = () => {
+    const id = toast?.place.id;
+    setToast(null);
+    if (id) onGuide(id);
+  };
+
+  if (z.phase === "off" && !toast && laugh === null) return null;
 
   const vw = typeof window !== "undefined" ? window.innerWidth : 400;
   const w = width();
@@ -107,7 +116,7 @@ export default function ZoroLost({ paused, reduced, onGuide }) {
   const bubbleLeft = Math.min(Math.max(z.x + w / 2 - 150, 10), vw - 310);
 
   return (
-    <div className="zoro-layer">
+    <div className="zoro-layer" style={{ "--zh": `${Math.round(w * 1.37)}px` }}>
       {z.phase !== "off" && (
         <button
           type="button"
@@ -122,7 +131,7 @@ export default function ZoroLost({ paused, reduced, onGuide }) {
       )}
 
       {z.phase === "lost" && (
-        <span className="zoro-hint" style={{ left: z.x + w / 2 - 26, "--zh": `${Math.round(w * 1.37)}px` }} aria-hidden="true">Lost?</span>
+        <span className="zoro-hint" style={{ left: z.x + w / 2 - 26 }} aria-hidden="true">Lost?</span>
       )}
 
       {z.phase === "ask" && (
@@ -137,7 +146,22 @@ export default function ZoroLost({ paused, reduced, onGuide }) {
         </div>
       )}
 
-      {toast && <p className="zoro-toast" role="status">{toast}</p>}
+      {laugh !== null && (
+        <span className="zoro-laugh" style={{ left: laugh }} aria-hidden="true">
+          <b>😂</b><i>💨</i>
+        </span>
+      )}
+
+      {toast && (
+        <div className="zoro-toast" role="status">
+          <span className="zoro-toast-emoji" aria-hidden="true">😂</span>
+          <p>
+            Zoro was heading for <strong>{toast.place.label}</strong>.
+            He's running the other way.
+          </p>
+          <button type="button" onClick={goThere}>Take me there</button>
+        </div>
+      )}
     </div>
   );
 }

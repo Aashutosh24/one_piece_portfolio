@@ -4,20 +4,35 @@
 let ctx = null;
 let master = null;
 let muted = false;
+const VOLUME = 0.9;
 
+// Call from any tap/click/key. Creates the audio context the first time and
+// resumes it whenever the browser has suspended it (phones do this often:
+// after a scroll-only touch, when the tab was in the background, etc.).
 export function unlockAudio() {
-  if (ctx) return ctx.state === "suspended" && ctx.resume();
   const AC = window.AudioContext || window.webkitAudioContext;
   if (!AC) return;
-  ctx = new AC();
-  master = ctx.createGain();
-  master.gain.value = muted ? 0 : 0.45;
-  master.connect(ctx.destination);
+  if (!ctx) {
+    ctx = new AC();
+    const comp = ctx.createDynamicsCompressor(); // keeps loud cues from clipping
+    comp.threshold.value = -12;
+    comp.ratio.value = 4;
+    master = ctx.createGain();
+    master.gain.value = muted ? 0 : VOLUME;
+    master.connect(comp).connect(ctx.destination);
+    // a silent blip fully unlocks audio on iOS
+    const b = ctx.createBuffer(1, 1, 22050);
+    const s = ctx.createBufferSource();
+    s.buffer = b;
+    s.connect(ctx.destination);
+    s.start(0);
+  }
+  if (ctx.state !== "running") ctx.resume().catch(() => {});
 }
 
 export function setMuted(m) {
   muted = m;
-  if (master) master.gain.setTargetAtTime(m ? 0 : 0.45, ctx.currentTime, 0.05);
+  if (master) master.gain.setTargetAtTime(m ? 0 : VOLUME, ctx.currentTime, 0.05);
 }
 
 function noise(seconds) {
@@ -35,17 +50,27 @@ function env(gain, t, peak, attack, release) {
   gain.gain.exponentialRampToValueAtTime(0.0001, t + attack + release);
 }
 
-// low heartbeat thump
+// heartbeat thump: a low body plus a mid "knock" that small phone speakers can play
 function thump(t, strength = 1) {
   const o = ctx.createOscillator();
   const g = ctx.createGain();
   o.type = "sine";
   o.frequency.setValueAtTime(95, t);
-  o.frequency.exponentialRampToValueAtTime(38, t + 0.18);
+  o.frequency.exponentialRampToValueAtTime(40, t + 0.18);
   env(g, t, 0.9 * strength, 0.01, 0.28);
   o.connect(g).connect(master);
   o.start(t);
   o.stop(t + 0.35);
+
+  const k = ctx.createOscillator();
+  const gk = ctx.createGain();
+  k.type = "triangle";
+  k.frequency.setValueAtTime(260, t);
+  k.frequency.exponentialRampToValueAtTime(120, t + 0.12);
+  env(gk, t, 0.55 * strength, 0.005, 0.16);
+  k.connect(gk).connect(master);
+  k.start(t);
+  k.stop(t + 0.22);
 }
 
 // steam hiss
@@ -55,7 +80,7 @@ function hiss(t, dur = 1.2) {
   f.type = "highpass";
   f.frequency.value = 2500;
   const g = ctx.createGain();
-  env(g, t, 0.18, 0.15, dur - 0.15);
+  env(g, t, 0.3, 0.15, dur - 0.15);
   n.connect(f).connect(g).connect(master);
   n.start(t);
 }
@@ -65,9 +90,9 @@ function whoomp(t) {
   const o = ctx.createOscillator();
   const g = ctx.createGain();
   o.type = "triangle";
-  o.frequency.setValueAtTime(55, t);
-  o.frequency.exponentialRampToValueAtTime(160, t + 0.55);
-  env(g, t, 0.35, 0.3, 0.3);
+  o.frequency.setValueAtTime(110, t);
+  o.frequency.exponentialRampToValueAtTime(340, t + 0.55);
+  env(g, t, 0.4, 0.3, 0.3);
   o.connect(g).connect(master);
   o.start(t);
   o.stop(t + 0.7);
@@ -75,6 +100,15 @@ function whoomp(t) {
 
 // big impact
 function boom(t) {
+  const m = ctx.createOscillator();
+  const gm = ctx.createGain();
+  m.type = "triangle";
+  m.frequency.setValueAtTime(220, t);
+  m.frequency.exponentialRampToValueAtTime(70, t + 0.4);
+  env(gm, t, 0.6, 0.005, 0.45);
+  m.connect(gm).connect(master);
+  m.start(t);
+  m.stop(t + 0.55);
   const o = ctx.createOscillator();
   const g = ctx.createGain();
   o.type = "sine";
@@ -87,9 +121,9 @@ function boom(t) {
   const n = noise(0.5);
   const f = ctx.createBiquadFilter();
   f.type = "lowpass";
-  f.frequency.value = 900;
+  f.frequency.value = 2600; // the crunch is what you hear on a phone
   const gn = ctx.createGain();
-  env(gn, t, 0.5, 0.005, 0.4);
+  env(gn, t, 0.8, 0.005, 0.45);
   n.connect(f).connect(gn).connect(master);
   n.start(t);
 }
@@ -130,8 +164,10 @@ const CUES = {
 };
 
 export function playCue(kind) {
-  if (!ctx || muted || ctx.state !== "running") return;
-  CUES[kind]?.(ctx.currentTime);
+  if (!ctx || muted) return;
+  if (ctx.state === "running") return CUES[kind]?.(ctx.currentTime);
+  // suspended (phone paused it): wake it, then play
+  ctx.resume().then(() => CUES[kind]?.(ctx.currentTime)).catch(() => {});
 }
 
 // Optional recorded clip (e.g. your own voice saying "Gear Second"), played on top
