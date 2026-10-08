@@ -248,12 +248,12 @@ export function Contact() {
               <a key={l.label} className="btn btn--ink" href={l.href} target="_blank" rel="noreferrer">{l.label}</a>
             ))}
           </div>
-          <div className="nakama-foot">
-            <span className="nakama-where">Based in {profile.location}</span>
+          {/* <div className="nakama-foot">
+            { <span className="nakama-where">Based in {profile.location}</span> }
             <nav className="nakama-quick" aria-label="Jump to">
               {NAKAMA_LINKS.slice(0, 3).map((l) => <a key={l.href} href={l.href}>{l.label}</a>)}
             </nav>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>
